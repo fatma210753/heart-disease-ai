@@ -4,6 +4,9 @@ import joblib
 
 st.set_page_config(page_title="MediAssist", layout="wide")
 
+# Anchor for scrolling
+st.markdown("<div id='top'></div>", unsafe_allow_html=True)
+
 # -----------------------------
 # Styling
 # -----------------------------
@@ -97,6 +100,17 @@ div.stButton > button:hover {
     border: 1px solid #90caf9;
 }
 
+.plain-text-box {
+    background: rgba(255,255,255,0.55);
+    border: 1px solid #dbe8f4;
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: #37474f;
+    font-size: 1.02rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
 .footer {
     text-align: center;
     color: #78909c;
@@ -180,10 +194,18 @@ with left:
     predict_clicked = st.button("🔍 Predict Diagnosis")
 
 with right:
+    st.markdown("<div id='result-section'></div>", unsafe_allow_html=True)
     st.markdown("<div class='section-title'>📊 Diagnosis Result</div>", unsafe_allow_html=True)
     st.markdown("<div class='small-note'>The final diagnosis is driven by the trained machine learning model.</div>", unsafe_allow_html=True)
 
     if predict_clicked:
+        # Auto scroll attempt
+        st.markdown("""
+        <script>
+        window.location.hash = "result-section";
+        </script>
+        """, unsafe_allow_html=True)
+
         data = {
             "age": age,
             "sex": sex,
@@ -230,22 +252,30 @@ with right:
             unsafe_allow_html=True
         )
 
-        # Clinical indicators from rule engine
+        # Clinical indicators
         reasons = rule_engine(age, cp, trestbps, chol, exang, oldpeak, ca)
 
         st.markdown("### 💡 Clinical Indicators")
-        if reasons:
-            st.write(", ".join(reasons))
-        else:
-            st.write("No major clinical indicators were flagged by the rule-based check.")
+        st.markdown(
+            f"<div class='plain-text-box'>"
+            f"{', '.join(reasons) if reasons else 'No major clinical indicators were flagged by the rule-based check.'}"
+            f"</div>",
+            unsafe_allow_html=True
+        )
 
+        # Recommendation
         st.markdown("### 🩺 Recommendation")
         if probability >= 0.75:
-            st.error("Immediate clinical consultation is strongly recommended.")
+            recommendation_text = "Immediate clinical consultation is strongly recommended."
         elif probability >= 0.45:
-            st.warning("Further medical examination is advised.")
+            recommendation_text = "Further medical examination is advised."
         else:
-            st.success("Maintain a healthy lifestyle and attend regular medical check-ups.")
+            recommendation_text = "Maintain a healthy lifestyle and attend regular medical check-ups."
+
+        st.markdown(
+            f"<div class='plain-text-box'>{recommendation_text}</div>",
+            unsafe_allow_html=True
+        )
 
     else:
         st.markdown(
