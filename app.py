@@ -5,147 +5,109 @@ import joblib
 st.set_page_config(page_title="MediAssist", layout="wide")
 
 # -----------------------------
-# Custom medical theme styling
+# Styling
 # -----------------------------
 st.markdown("""
 <style>
-/* Main app background */
 .stApp {
-    background: linear-gradient(135deg, #eef7ff 0%, #f8fcff 45%, #e3f2fd 100%);
+    background: linear-gradient(135deg, #eef7fb 0%, #f7fbff 50%, #e6f2ff 100%);
     color: #1f2d3d;
 }
 
-/* Remove extra top spacing a bit */
 .block-container {
-    padding-top: 2rem;
+    padding-top: 1.5rem;
     padding-bottom: 2rem;
 }
 
-/* Main title */
 .main-title {
     text-align: center;
     color: #1976d2;
-    font-size: 3.2rem;
+    font-size: 3.4rem;
     font-weight: 800;
     margin-bottom: 0.2rem;
 }
 
-/* Subtitle */
 .sub-title {
     text-align: center;
-    color: #4f5b67;
+    color: #546e7a;
     font-size: 1.35rem;
     font-weight: 500;
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.5rem;
 }
 
-/* Section cards */
-.card {
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid #d9ebf7;
-    border-radius: 22px;
-    padding: 24px 22px;
-    box-shadow: 0 8px 24px rgba(25, 118, 210, 0.10);
-    backdrop-filter: blur(6px);
-    margin-bottom: 1rem;
-}
-
-/* Section headings */
 .section-title {
     color: #1565c0;
     font-size: 2rem;
     font-weight: 700;
+    margin-bottom: 0.7rem;
+}
+
+.small-note {
+    color: #607d8b;
+    font-size: 0.95rem;
     margin-bottom: 1rem;
 }
 
-/* Small info pill */
-.badge {
-    display: inline-block;
-    background: #e3f2fd;
-    color: #1565c0;
-    border: 1px solid #bbdefb;
-    padding: 0.35rem 0.8rem;
-    border-radius: 999px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 0.8rem;
-}
-
-/* Predict button */
 div.stButton > button {
     background: linear-gradient(90deg, #1e88e5, #42a5f5);
     color: white;
     border: none;
     border-radius: 12px;
-    padding: 0.7rem 1.4rem;
+    padding: 0.7rem 1.3rem;
     font-size: 1.05rem;
     font-weight: 700;
-    box-shadow: 0 6px 18px rgba(30, 136, 229, 0.25);
+    box-shadow: 0 6px 18px rgba(30, 136, 229, 0.22);
 }
 
 div.stButton > button:hover {
-    background: linear-gradient(90deg, #1976d2, #2196f3);
     color: white;
+    background: linear-gradient(90deg, #1976d2, #2196f3);
 }
 
-/* Input boxes */
-div[data-baseweb="select"] > div,
-div[data-baseweb="input"] > div {
-    border-radius: 12px !important;
-}
-
-/* Result cards */
-.result-box {
+.result-card {
     border-radius: 18px;
     padding: 18px 20px;
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    margin-top: 0.8rem;
+    margin-top: 0.6rem;
     margin-bottom: 1rem;
 }
 
-.result-positive {
+.red-card {
     background: #ffebee;
     color: #c62828;
     border: 1px solid #ef9a9a;
 }
 
-.result-negative {
+.green-card {
     background: #e8f5e9;
     color: #2e7d32;
     border: 1px solid #a5d6a7;
 }
 
-.risk-high {
-    background: #ffebee;
-    color: #b71c1c;
-    border: 1px solid #ef9a9a;
-}
-
-.risk-medium {
+.orange-card {
     background: #fff3e0;
     color: #ef6c00;
     border: 1px solid #ffcc80;
 }
 
-.risk-low {
-    background: #e8f5e9;
-    color: #2e7d32;
-    border: 1px solid #a5d6a7;
+.blue-card {
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #90caf9;
 }
 
-/* Footer */
 .footer {
     text-align: center;
-    color: #607d8b;
-    margin-top: 1.5rem;
+    color: #78909c;
+    margin-top: 1.8rem;
     font-size: 0.95rem;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# Load model files
+# Load files
 # -----------------------------
 model = joblib.load("heart_disease_rf_model.pkl")
 model_columns = joblib.load("model_columns.pkl")
@@ -155,52 +117,51 @@ model_columns = joblib.load("model_columns.pkl")
 # -----------------------------
 st.markdown("<div class='main-title'>💙 MediAssist - Heart Disease AI System</div>", unsafe_allow_html=True)
 st.markdown("<div class='sub-title'>AI-powered medical diagnosis support tool with machine learning and clinical reasoning</div>", unsafe_allow_html=True)
+st.write("")
 
 # -----------------------------
-# Rule engine
+# Helper functions
 # -----------------------------
 def rule_engine(age, cp, trestbps, chol, exang, oldpeak, ca):
-    score = 0
     reasons = []
 
     if age >= 55:
-        score += 1
         reasons.append("older age")
     if cp == 0:
-        score += 2
-        reasons.append("chest pain risk")
+        reasons.append("high-risk chest pain pattern")
+    elif cp in [2, 3]:
+        reasons.append("abnormal chest pain type")
     if trestbps >= 140:
-        score += 1
         reasons.append("high blood pressure")
     if chol >= 240:
-        score += 1
         reasons.append("high cholesterol")
     if exang == 1:
-        score += 2
         reasons.append("exercise-induced angina")
     if oldpeak >= 2:
-        score += 2
         reasons.append("high oldpeak")
+    elif oldpeak >= 1:
+        reasons.append("mild oldpeak elevation")
     if ca >= 1:
-        score += 2
         reasons.append("major vessels affected")
 
-    if score >= 7:
-        return "High Risk", reasons, "risk-high"
-    elif score >= 4:
-        return "Moderate Risk", reasons, "risk-medium"
+    return reasons
+
+def overall_risk_from_probability(prob):
+    if prob >= 0.75:
+        return "High Risk", "red-card"
+    elif prob >= 0.45:
+        return "Moderate Risk", "orange-card"
     else:
-        return "Low Risk", reasons, "risk-low"
+        return "Low Risk", "green-card"
 
 # -----------------------------
 # Layout
 # -----------------------------
-col1, col2 = st.columns([1.08, 1])
+left, right = st.columns([1.05, 1], gap="large")
 
-with col1:
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("<div class='badge'>Patient Input Panel</div>", unsafe_allow_html=True)
+with left:
     st.markdown("<div class='section-title'>🩺 Patient Information</div>", unsafe_allow_html=True)
+    st.markdown("<div class='small-note'>Enter the patient’s clinical details below.</div>", unsafe_allow_html=True)
 
     age = st.number_input("Age", 1, 120, 50)
     sex = st.selectbox("Sex", [0, 1], format_func=lambda x: "Female" if x == 0 else "Male")
@@ -217,12 +178,10 @@ with col1:
     thal = st.selectbox("Thal", [0, 1, 2, 3])
 
     predict_clicked = st.button("🔍 Predict Diagnosis")
-    st.markdown("</div>", unsafe_allow_html=True)
 
-with col2:
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("<div class='badge'>Decision Support Output</div>", unsafe_allow_html=True)
+with right:
     st.markdown("<div class='section-title'>📊 Diagnosis Result</div>", unsafe_allow_html=True)
+    st.markdown("<div class='small-note'>The final diagnosis is driven by the trained machine learning model.</div>", unsafe_allow_html=True)
 
     if predict_clicked:
         data = {
@@ -252,37 +211,46 @@ with col2:
         prediction = model.predict(df_input)[0]
         probability = model.predict_proba(df_input)[0][1]
 
-        risk, reasons, risk_class = rule_engine(age, cp, trestbps, chol, exang, oldpeak, ca)
-
+        # ML diagnosis
         if prediction == 1:
             st.markdown(
-                f"<div class='result-box result-positive'>⚠️ Heart Disease Detected<br><br>Confidence: {probability*100:.2f}%</div>",
+                f"<div class='result-card red-card'>⚠️ Heart Disease Detected<br><br>Model Confidence: {probability*100:.2f}%</div>",
                 unsafe_allow_html=True
             )
         else:
             st.markdown(
-                f"<div class='result-box result-negative'>✅ No Heart Disease Detected<br><br>Confidence: {(1-probability)*100:.2f}%</div>",
+                f"<div class='result-card green-card'>✅ No Heart Disease Detected<br><br>Model Confidence: {(1-probability)*100:.2f}%</div>",
                 unsafe_allow_html=True
             )
 
+        # Overall risk based on model probability
+        risk_label, risk_class = overall_risk_from_probability(probability)
         st.markdown(
-            f"<div class='result-box {risk_class}'>Risk Level: {risk}</div>",
+            f"<div class='result-card {risk_class}'>Risk Level: {risk_label}</div>",
             unsafe_allow_html=True
         )
 
-        st.markdown("### 💡 AI Explanation")
-        st.write(", ".join(reasons) if reasons else "No major risk factors detected.")
+        # Clinical indicators from rule engine
+        reasons = rule_engine(age, cp, trestbps, chol, exang, oldpeak, ca)
+
+        st.markdown("### 💡 Clinical Indicators")
+        if reasons:
+            st.write(", ".join(reasons))
+        else:
+            st.write("No major clinical indicators were flagged by the rule-based check.")
 
         st.markdown("### 🩺 Recommendation")
-        if risk == "High Risk":
+        if probability >= 0.75:
             st.error("Immediate clinical consultation is strongly recommended.")
-        elif risk == "Moderate Risk":
+        elif probability >= 0.45:
             st.warning("Further medical examination is advised.")
         else:
             st.success("Maintain a healthy lifestyle and attend regular medical check-ups.")
-    else:
-        st.info("Enter the patient information and click Predict Diagnosis to view the AI result.")
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.markdown(
+            "<div class='result-card blue-card'>Enter the patient information and click Predict Diagnosis to view the AI result.</div>",
+            unsafe_allow_html=True
+        )
 
 st.markdown("<div class='footer'>Developed for AI Medical Diagnosis Coursework</div>", unsafe_allow_html=True)
