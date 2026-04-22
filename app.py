@@ -10,6 +10,45 @@ st.set_page_config(page_title="MediAssist", layout="wide")
 if "show_results" not in st.session_state:
     st.session_state.show_results = False
 
+if "age" not in st.session_state:
+    st.session_state.age = 50
+
+if "sex" not in st.session_state:
+    st.session_state.sex = 1
+
+if "cp" not in st.session_state:
+    st.session_state.cp = 0
+
+if "trestbps" not in st.session_state:
+    st.session_state.trestbps = 120
+
+if "chol" not in st.session_state:
+    st.session_state.chol = 200
+
+if "fbs" not in st.session_state:
+    st.session_state.fbs = 0
+
+if "restecg" not in st.session_state:
+    st.session_state.restecg = 0
+
+if "thalach" not in st.session_state:
+    st.session_state.thalach = 150
+
+if "exang" not in st.session_state:
+    st.session_state.exang = 0
+
+if "oldpeak" not in st.session_state:
+    st.session_state.oldpeak = 1.0
+
+if "slope" not in st.session_state:
+    st.session_state.slope = 1
+
+if "ca" not in st.session_state:
+    st.session_state.ca = 0
+
+if "thal" not in st.session_state:
+    st.session_state.thal = 1
+
 # -----------------------------
 # Styling
 # -----------------------------
@@ -143,7 +182,8 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown("<div class='section-title'>🩺 Patient Clinical Details</div>", unsafe_allow_html=True)
 
-    age = st.number_input("Age (years)", 1, 120, 50, key="age")
+    # Patient Inputs
+    age = st.number_input("Age (years)", 1, 120, st.session_state.age, key="age")
 
     sex = st.selectbox(
         "Biological Sex",
@@ -166,14 +206,12 @@ with col1:
 
     trestbps = st.number_input(
         "Resting Blood Pressure (mm Hg)",
-        50, 250, 120,
-        key="trestbps"
+        50, 250, st.session_state.trestbps, key="trestbps"
     )
 
     chol = st.number_input(
         "Serum Cholesterol (mg/dl)",
-        50, 600, 200,
-        key="chol"
+        50, 600, st.session_state.chol, key="chol"
     )
 
     fbs = st.selectbox(
@@ -196,8 +234,7 @@ with col1:
 
     thalach = st.number_input(
         "Maximum Heart Rate Achieved",
-        50, 250, 150,
-        key="thalach"
+        50, 250, st.session_state.thalach, key="thalach"
     )
 
     exang = st.selectbox(
@@ -209,8 +246,7 @@ with col1:
 
     oldpeak = st.number_input(
         "ST Depression (Oldpeak)",
-        0.0, 10.0, 1.0,
-        key="oldpeak"
+        0.0, 10.0, st.session_state.oldpeak, key="oldpeak"
     )
 
     slope = st.selectbox(
