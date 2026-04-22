@@ -5,49 +5,14 @@ import joblib
 st.set_page_config(page_title="MediAssist", layout="wide")
 
 # -----------------------------
-# Session state
+# Session state to handle form resets
 # -----------------------------
 if "show_results" not in st.session_state:
     st.session_state.show_results = False
 
-if "age" not in st.session_state:
-    st.session_state.age = 50
-
-if "sex" not in st.session_state:
-    st.session_state.sex = 1
-
-if "cp" not in st.session_state:
-    st.session_state.cp = 0
-
-if "trestbps" not in st.session_state:
-    st.session_state.trestbps = 120
-
-if "chol" not in st.session_state:
-    st.session_state.chol = 200
-
-if "fbs" not in st.session_state:
-    st.session_state.fbs = 0
-
-if "restecg" not in st.session_state:
-    st.session_state.restecg = 0
-
-if "thalach" not in st.session_state:
-    st.session_state.thalach = 150
-
-if "exang" not in st.session_state:
-    st.session_state.exang = 0
-
-if "oldpeak" not in st.session_state:
-    st.session_state.oldpeak = 1.0
-
-if "slope" not in st.session_state:
-    st.session_state.slope = 1
-
-if "ca" not in st.session_state:
-    st.session_state.ca = 0
-
-if "thal" not in st.session_state:
-    st.session_state.thal = 1
+# To reset all inputs:
+if "reset" not in st.session_state:
+    st.session_state.reset = False
 
 # -----------------------------
 # Styling
@@ -183,7 +148,7 @@ with col1:
     st.markdown("<div class='section-title'>🩺 Patient Clinical Details</div>", unsafe_allow_html=True)
 
     # Patient Inputs
-    age = st.number_input("Age (years)", 1, 120, st.session_state.age, key="age")
+    age = st.number_input("Age (years)", 1, 120, key="age")
 
     sex = st.selectbox(
         "Biological Sex",
@@ -206,12 +171,14 @@ with col1:
 
     trestbps = st.number_input(
         "Resting Blood Pressure (mm Hg)",
-        50, 250, st.session_state.trestbps, key="trestbps"
+        50, 250, 120,
+        key="trestbps"
     )
 
     chol = st.number_input(
         "Serum Cholesterol (mg/dl)",
-        50, 600, st.session_state.chol, key="chol"
+        50, 600, 200,
+        key="chol"
     )
 
     fbs = st.selectbox(
@@ -234,7 +201,8 @@ with col1:
 
     thalach = st.number_input(
         "Maximum Heart Rate Achieved",
-        50, 250, st.session_state.thalach, key="thalach"
+        50, 250, 150,
+        key="thalach"
     )
 
     exang = st.selectbox(
@@ -246,7 +214,8 @@ with col1:
 
     oldpeak = st.number_input(
         "ST Depression (Oldpeak)",
-        0.0, 10.0, st.session_state.oldpeak, key="oldpeak"
+        0.0, 10.0, 1.0,
+        key="oldpeak"
     )
 
     slope = st.selectbox(
@@ -285,9 +254,7 @@ with col1:
         reset = st.button("🔄 Reset")
 
     if reset:
-        # Reset session state to clear inputs
-        for key in st.session_state:
-            del st.session_state[key]
+        st.session_state.clear()  # Clears session state completely
         st.session_state.show_results = False
         st.rerun()
 
