@@ -285,7 +285,10 @@ with col1:
         reset = st.button("🔄 Reset")
 
     if reset:
-        st.session_state.clear()
+        # Reset session state to clear inputs
+        for key in st.session_state:
+            del st.session_state[key]
+        st.session_state.show_results = False
         st.rerun()
 
 with col2:
