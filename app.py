@@ -5,14 +5,49 @@ import joblib
 st.set_page_config(page_title="MediAssist", layout="wide")
 
 # -----------------------------
-# Session state to handle form resets
+# Session state handling reset
 # -----------------------------
 if "show_results" not in st.session_state:
     st.session_state.show_results = False
 
-# To reset all inputs:
-if "reset" not in st.session_state:
-    st.session_state.reset = False
+if "age" not in st.session_state:
+    st.session_state.age = None
+
+if "sex" not in st.session_state:
+    st.session_state.sex = None
+
+if "cp" not in st.session_state:
+    st.session_state.cp = None
+
+if "trestbps" not in st.session_state:
+    st.session_state.trestbps = None
+
+if "chol" not in st.session_state:
+    st.session_state.chol = None
+
+if "fbs" not in st.session_state:
+    st.session_state.fbs = None
+
+if "restecg" not in st.session_state:
+    st.session_state.restecg = None
+
+if "thalach" not in st.session_state:
+    st.session_state.thalach = None
+
+if "exang" not in st.session_state:
+    st.session_state.exang = None
+
+if "oldpeak" not in st.session_state:
+    st.session_state.oldpeak = None
+
+if "slope" not in st.session_state:
+    st.session_state.slope = None
+
+if "ca" not in st.session_state:
+    st.session_state.ca = None
+
+if "thal" not in st.session_state:
+    st.session_state.thal = None
 
 # -----------------------------
 # Styling
@@ -254,7 +289,8 @@ with col1:
         reset = st.button("🔄 Reset")
 
     if reset:
-        st.session_state.clear()  # Clears session state completely
+        # Reset session state completely
+        st.session_state.clear()
         st.session_state.show_results = False
         st.rerun()
 
